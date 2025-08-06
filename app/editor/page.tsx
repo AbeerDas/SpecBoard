@@ -6,18 +6,13 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Save, GitBranch, Users, CheckCircle, HelpCircle, Eye, Zap, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { EnhancementOptionsDropdown } from "@/components/enhancement-options"
+import { ClarifierResponse, EnhancedData, EnhancementOptions, DEFAULT_ENHANCEMENT_OPTIONS } from "@/types/enhancement"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 
-interface ClarifierResponse {
-  [question: string]: string
-}
 
-interface EnhancedData {
-  enhanced_specification: string
-  thought_clarifiers: string[]
-}
 
 export default function EditorPage() {
   const searchParams = useSearchParams()
@@ -38,6 +33,8 @@ export default function EditorPage() {
   const [enhancedData, setEnhancedData] = useState<EnhancedData | null>(null)
   const [enhancementError, setEnhancementError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
+  const [enhancementOptions, setEnhancementOptions] = useState<EnhancementOptions>(DEFAULT_ENHANCEMENT_OPTIONS)
+  const [showEnhancementOptions, setShowEnhancementOptions] = useState(false)
 
   // Load specification based on ID or default
   useEffect(() => {
@@ -196,7 +193,8 @@ Describe your project or feature here...
         },
         body: JSON.stringify({
           specification,
-          clarifierResponses
+          clarifierResponses,
+          enhancementOptions
         }),
       })
 
@@ -403,18 +401,26 @@ Describe your project or feature here...
                   </Badge>
                 </div>
               </div>
-              <Button 
-                onClick={() => handleGenerate(false)}
-                disabled={isGenerating}
-                className="bg-blue-600 hover:bg-blue-700 text-white shrink-0"
-              >
-                {isGenerating ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Zap className="h-4 w-4 mr-2" />
-                )}
-                {isGenerating ? 'Generating...' : 'Generate'}
-              </Button>
+              <div className="flex items-center space-x-2">
+                <EnhancementOptionsDropdown
+                  options={enhancementOptions}
+                  onOptionsChange={setEnhancementOptions}
+                  isOpen={showEnhancementOptions}
+                  onOpenChange={setShowEnhancementOptions}
+                />
+                <Button 
+                  onClick={() => handleGenerate(false)}
+                  disabled={isGenerating}
+                  className="bg-blue-600 hover:bg-blue-700 text-white shrink-0"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Zap className="h-4 w-4 mr-2" />
+                  )}
+                  {isGenerating ? 'Generating...' : 'Generate'}
+                </Button>
+              </div>
             </div>
           </div>
 
