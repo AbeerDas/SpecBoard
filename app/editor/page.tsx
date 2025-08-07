@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { Save, GitBranch, Users, CheckCircle, HelpCircle, Eye, Zap, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { Save, GitBranch, Users, CheckCircle, HelpCircle, Eye, Zap, Loader2, AlertCircle, RefreshCw, Copy } from 'lucide-react'
 import { EnhancementOptionsDropdown } from "@/components/enhancement-options"
 import { ClarifierResponse, EnhancedData, EnhancementOptions, DEFAULT_ENHANCEMENT_OPTIONS } from "@/types/enhancement"
 import Link from "next/link"
@@ -35,6 +35,7 @@ export default function EditorPage() {
   const [retryCount, setRetryCount] = useState(0)
   const [enhancementOptions, setEnhancementOptions] = useState<EnhancementOptions>(DEFAULT_ENHANCEMENT_OPTIONS)
   const [showEnhancementOptions, setShowEnhancementOptions] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
 
   // Load specification based on ID or default
   useEffect(() => {
@@ -328,6 +329,31 @@ Describe your project or feature here...
     }
   }
 
+  const handleCopySpecification = async () => {
+    try {
+      await navigator.clipboard.writeText(specification)
+      setIsCopied(true)
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy text:', error)
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = specification
+      document.body.appendChild(textArea)
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
+      } catch (fallbackError) {
+        console.error('Fallback copy failed:', fallbackError)
+        alert('Failed to copy text to clipboard')
+      }
+      document.body.removeChild(textArea)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       {/* Navigation */}
@@ -428,7 +454,19 @@ Describe your project or feature here...
           <div className="flex-1 p-4 sm:p-6 space-y-4 overflow-auto">
             {/* Main Specification Textarea */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Current Specification</label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-gray-300">Current Specification</label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopySpecification}
+                  className="text-gray-400 hover:text-white h-8 px-2"
+                  disabled={!specification.trim()}
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  {isCopied ? 'Copied!' : 'Copy'}
+                </Button>
+              </div>
               <Textarea
                 value={specification}
                 onChange={(e) => handleSpecificationChange(e.target.value)}
