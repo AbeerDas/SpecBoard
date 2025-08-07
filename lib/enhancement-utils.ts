@@ -48,7 +48,8 @@ ${Object.entries(clarifierResponses)
 `
     : ""
 
-  return `You are a senior software architect and technical specification expert with 15+ years of experience in modern software development. You specialize in creating clear, actionable technical specifications that bridge the gap between business requirements and implementation details.
+  return `You are a senior software architect and technical specification expert with 15+ years of experience in modern software development. 
+  You specialize in creating clear, actionable technical specifications that bridge the gap between business requirements and implementation details.
 
 Your role is to enhance specifications by adding technical depth while maintaining clarity and actionable guidance.
 
